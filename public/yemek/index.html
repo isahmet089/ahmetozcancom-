@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yemek Şirketi Ödeme Takip</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Genel Stiller */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('dark-theme.css');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            min-height: 100vh;
+            animation: pageTransition 0.5s ease-out;
+        }
+
+        .container {
+            max-width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header Stili */
+        header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.25);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ana İçerik Stili */
+        main {
+            flex: 1;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Menü Kartları */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .menu-card {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px var(--shadow-color);
+        }
+
+        .menu-card-header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            z-index: 1;
+        }
+
+        .menu-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .menu-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .menu-card-body {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .menu-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .menu-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 0.8rem   var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .menu-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+            transition: left 0.7s ease;
+            z-index: -1;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .menu-button:hover::before {
+            left: 100%;
+        }
+
+        .menu-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .menu-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .menu-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .menu-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .menu-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .menu-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        /* Footer Stili */
+        footer {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 0.9rem;
+            margin-top: auto;
+            box-shadow: 0 -4px 20px rgba(255, 107, 107, 0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pageTransition {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tablet ve Daha Büyük Ekranlar İçin */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+                margin: 0 auto;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                overflow: hidden;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Büyük Ekranlar İçin */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+            
+            .menu-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Yemek Şirketi Ödeme Takip</h1>
+        </header>
+        
+        <main>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h2 class="menu-title">Genel Durum</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Genel durum bilgilerini, istatistikleri ve grafikleri görüntüleyin.</p>
+                        <a href="dashboard.html" class="menu-button">Görüntüle</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h2 class="menu-title">Müşteriler</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Müşteri listesini görüntüleyin, yeni müşteri ekleyin veya düzenleyin.</p>
+                        <a href="clients.html" class="menu-button">Görüntüle</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h2 class="menu-title">Ödemeler</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Tüm ödemeleri görüntüleyin, yeni ödeme ekleyin veya filtreleme yapın.</p>
+                        <a href="payments.html" class="menu-button">Görüntüle</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h2 class="menu-title">Haftalık Analiz</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Haftalık ödeme analizlerini, grafikleri ve istatistikleri görüntüleyin.</p>
+                        <a href="weekly-analysis.html" class="menu-button">Görüntüle</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h2 class="menu-title">Aylık Analiz</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Aylık ödeme analizlerini, grafikleri ve istatistikleri görüntüleyin.</p>
+                        <a href="monthly-analysis.html" class="menu-button">Görüntüle</a>
+                    </div>
+                </div>
+                
+                <div class="menu-card">
+                    <div class="menu-card-header">
+                        <div class="menu-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <h2 class="menu-title">Yeni Ödeme</h2>
+                    </div>
+                    <div class="menu-card-body">
+                        <p class="menu-description">Hızlıca yeni bir ödeme ekleyin ve kaydedin.</p>
+                        <a href="new-payment.html" class="menu-button">Ekle</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Yemek Şirketi Ödeme Takip</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Menü kartları için hover efekti
+            const menuCards = document.querySelectorAll('.menu-card');
+            
+            menuCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                    this.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Menü butonları için hover efekti
+            const menuButtons = document.querySelectorAll('.menu-button');
+            
+            menuButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 8px 25px rgba(255, 107, 107, 0.4)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

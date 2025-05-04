@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aylık Analiz | Yemek Şirketi Ödeme Takip</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Genel Stiller */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('dark-theme.css');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            min-height: 100vh;
+            animation: pageTransition 0.5s ease-out;
+        }
+
+        .container {
+            max-width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header Stili */
+        header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.25);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Ana İçerik Stili */
+        main {
+            flex: 1;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Tarih Seçici */
+        .date-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--card-color);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .month-nav {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .month-nav:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .current-month {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* İstatistik Kartları */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+        }
+
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            opacity: 0.2;
+        }
+
+        /* Grafik Bölümleri */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .chart-period {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 250px;
+            position: relative;
+        }
+
+        /* Müşteri Tablosu */
+        .client-details {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .client-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .client-table th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .client-table td {
+            padding: 0.8rem 1rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .client-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .client-table tr:hover td {
+            background-color: rgba(255, 107, 107, 0.05);
+        }
+
+        .client-amount {
+            font-weight: 500;
+            color: var(--success-color);
+        }
+
+        .client-transactions {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .client-percentage {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .percentage-bar {
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            width: 100px;
+            overflow: hidden;
+        }
+
+        .percentage-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Footer Stili */
+        footer {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 0.9rem;
+            margin-top: auto;
+            box-shadow: 0 -4px 20px rgba(255, 107, 107, 0.15);
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pageTransition {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tablet ve Daha Büyük Ekranlar İçin */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 768px;
+                margin: 0 auto;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                overflow: hidden;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        /* Büyük Ekranlar İçin */
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
+            <h1>Aylık Analiz</h1>
+        </header>
+        
+        <main>
+            <!-- Tarih Seçici -->
+            <div class="date-selector">
+                <div class="month-selector">
+                    <button class="month-nav" id="prevMonth">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    
+                    <div class="current-month">Mayıs 2024</div>
+                    <button class="month-nav" id="nextMonth">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- İstatistik Kartları -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave stat-icon"></i>
+                    <div class="stat-title">Aylık Gelir</div>
+                    <div class="stat-value">₺20,200</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> %8.3 geçen aya göre
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-receipt stat-icon"></i>
+                    <div class="stat-title">İşlem Sayısı</div>
+                    <div class="stat-value">4</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i> %20 geçen aya göre
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-chart-bar stat-icon"></i>
+                    <div class="stat-title">Ortalama İşlem</div>
+                    <div class="stat-value">₺5,050</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> %35.4 geçen aya göre
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-users stat-icon"></i>
+                    <div class="stat-title">Aktif Müşteriler</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> %50 geçen aya göre
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grafik Bölümleri -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Günlük Gelir Dağılımı</div>
+                        <div class="chart-period">Mayıs 2024</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dailyDistributionChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Müşteri Dağılımı</div>
+                        <div class="chart-period">Mayıs 2024</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="clientDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Müşteri Tablosu -->
+            <div class="client-details">
+                <div class="table-header">
+                    <div class="table-title">Müşteri Bazlı Analiz</div>
+                </div>
+                
+                <table class="client-table">
+                    <thead>
+                        <tr>
+                            <th>Müşteri</th>
+                            <th>İşlem Sayısı</th>
+                            <th>Toplam</th>
+                            <th>Oran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ABC Şirketi</td>
+                            <td class="client-transactions">2</td>
+                            <td class="client-amount">₺9,500</td>
+                            <td>
+                                <div class="client-percentage">
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 47%;"></div>
+                                    </div>
+                                    %47
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>XYZ Holding</td>
+                            <td class="client-transactions">1</td>
+                            <td class="client-amount">₺7,500</td>
+                            <td>
+                                <div class="client-percentage">
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 37%;"></div>
+                                    </div>
+                                    %37
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>123 Teknoloji</td>
+                            <td class="client-transactions">1</td>
+                            <td class="client-amount">₺3,200</td>
+                            <td>
+                                <div class="client-percentage">
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 16%;"></div>
+                                    </div>
+                                    %16
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mega Gıda</td>
+                            <td class="client-transactions">0</td>
+                            <td class="client-amount">₺0</td>
+                            <td>
+                                <div class="client-percentage">
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 0%;"></div>
+                                    </div>
+                                    %0
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Star Ofis</td>
+                            <td class="client-transactions">0</td>
+                            <td class="client-amount">₺0</td>
+                            <td>
+                                <div class="client-percentage">
+                                    <div class="percentage-bar">
+                                        <div class="percentage-fill" style="width: 0%;"></div>
+                                    </div>
+                                    %0
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 Yemek Şirketi Ödeme Takip</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Günlük Gelir Dağılımı Grafiği
+            const dailyDistributionCtx = document.getElementById('dailyDistributionChart').getContext('2d');
+            const dailyDistributionChart = new Chart(dailyDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1', '5', '10', '15', '20', '25', '30'],
+                    datasets: [{
+                        label: 'Günlük Gelir (₺)',
+                        data: [0, 3200, 7500, 5000, 0, 4500, 0],
+                        backgroundColor: 'rgba(255, 107, 107, 0.7)',
+                        borderColor: '#ff6b6b',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#2d2d2d',
+                            titleColor: '#f5f5f5',
+                            bodyColor: '#f5f5f5',
+                            borderColor: '#444444',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                title: function(context) {
+                                    return `Mayıs ${context[0].label}, 2024`;
+                                },
+                                label: function(context) {
+                                    return `₺${context.raw.toLocaleString('tr-TR')}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#b3b3b3',
+                                callback: function(value) {
+                                    return `₺${value / 1000}K`;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#b3b3b3'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Müşteri Dağılımı Grafiği
+            const clientDistributionCtx = document.getElementById('clientDistributionChart').getContext('2d');
+            const clientDistributionChart = new Chart(clientDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ABC Şirketi', 'XYZ Holding', '123 Teknoloji'],
+                    datasets: [{
+                        data: [9500, 7500, 3200],
+                        backgroundColor: [
+                            '#ff6b6b',
+                            '#4ecdc4',
+                            '#ffe66d'
+                        ],
+                        borderColor: '#2d2d2d',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#b3b3b3',
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#2d2d2d',
+                            titleColor: '#f5f5f5',
+                            bodyColor: '#f5f5f5',
+                            borderColor: '#444444',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((acc, data) => acc + data, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `₺${value.toLocaleString('tr-TR')} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+            
+            // İstatistik kartları için hover efekti
+            const statCards = document.querySelectorAll('.stat-card');
+            
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Ay navigasyonu
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const currentMonthEl = document.querySelector('.current-month');
+            
+            const months = [
+                'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+            ];
+            
+            let currentMonthIndex = 4; // Mayıs
+            let currentYear = 2024;
+            
+            prevMonthBtn.addEventListener('click', function() {
+                currentMonthIndex--;
+                if (currentMonthIndex < 0) {
+                    currentMonthIndex = 11;
+                    currentYear--;
+                }
+                updateMonthDisplay();
+            });
+            
+            nextMonthBtn.addEventListener('click', function() {
+                currentMonthIndex++;
+                if (currentMonthIndex > 11) {
+                    currentMonthIndex = 0;
+                    currentYear++;
+                }
+                updateMonthDisplay();
+            });
+            
+            function updateMonthDisplay() {
+                currentMonthEl.textContent = `${months[currentMonthIndex]} ${currentYear}`;
+            }
+        });
+    </script>
+</body>
+</html>

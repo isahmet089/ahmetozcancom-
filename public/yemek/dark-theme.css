@@ -1,0 +1,66 @@
+/* Karanlık Tema CSS Değişkenleri */
+:root {
+    /* Karanlık Tema Renkleri */
+    --primary-color: #ff6b6b;
+    --primary-dark: #ff5252;
+    --secondary-color: #4ecdc4;
+    --accent-color: #ffe66d;
+    --background-color: #1a1a1a;
+    --card-color: #2d2d2d;
+    --text-color: #f5f5f5;
+    --text-light: #b3b3b3;
+    --border-color: #444444;
+    --success-color: #00b894;
+    --warning-color: #fdcb6e;
+    --danger-color: #ff6b6b;
+    --gradient-start: #ff6b6b;
+    --gradient-end: #ff8e8e;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --input-bg: #333333;
+    --chart-bg: #2d2d2d;
+}
+
+/* Karanlık Tema Genel Stilleri */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+input, select, textarea {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+input::placeholder, select::placeholder, textarea::placeholder {
+    color: var(--text-light);
+}
+
+.card, .form-container, .client-item, .payment-item, .no-results {
+    background-color: var(--card-color);
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+/* Karanlık Tema İçin Özel Ayarlamalar */
+.search-input {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.filter-option {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-light);
+}
+
+.filter-option:hover {
+    background-color: rgba(255, 107, 107, 0.2);
+}
+
+/* Grafik Renkleri */
+.chart-container {
+    background-color: var(--chart-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 5px 15px var(--shadow-color);
+}

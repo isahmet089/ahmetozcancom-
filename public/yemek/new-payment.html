@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yeni Ödeme Ekle | Yemek Şirketi Ödeme Takip</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Genel Stiller */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('dark-theme.css');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        line-height: 1.6;
+        min-height: 100vh;
+        animation: pageTransition 0.5s ease-out;
+    }
+
+    .container {
+        max-width: 100%;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* Header Stili */
+    header {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        padding: 1.2rem;
+        text-align: center;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.25);
+        z-index: 10;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: 0.5px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-button {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 1.2rem;
+        text-decoration: none;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    /* Ana İçerik Stili */
+    main {
+        flex: 1;
+        padding: 1.5rem;
+        position: relative;
+        z-index: 1;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Form Stili */
+    .form-container {
+        background-color: var(--card-color);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px var(--shadow-color);
+        max-width: 500px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+
+    .form-group {
+        margin-bottom: 1.8rem;
+        position: relative;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.95rem;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: var(--input-bg);
+        color: var(--text-color);
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: var(--text-light);
+    }
+
+    .submit-button {
+        width: 100%;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .submit-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+        transition: left 0.7s ease;
+        z-index: -1;
+    }
+
+    .submit-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    .submit-button:hover::before {
+        left: 100%;
+    }
+
+    .submit-button i {
+        margin-right: 0.5rem;
+    }
+
+    /* Footer Stili */
+    footer {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        text-align: center;
+        padding: 1.2rem;
+        font-size: 0.9rem;
+        margin-top: auto;
+        box-shadow: 0 -4px 20px rgba(255, 107, 107, 0.15);
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Animasyonlar */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pageTransition {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tablet ve Daha Büyük Ekranlar İçin */
+    @media (min-width: 768px) {
+        .container {
+            max-width: 768px;
+            margin: 0 auto;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .form-container {
+            padding: 2.5rem;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <a href="index.html" class="back-button"><i class="fas fa-arrow-left"></i></a>
+        <h1>Yeni Ödeme Ekle</h1>
+    </header>
+    
+    <main>
+        <form class="form-container" id="newPaymentForm">
+            <div class="form-group">
+                <label for="clientSelect">Müşteri</label>
+                <select id="clientSelect" name="clientId" required>
+                    <option value="" disabled selected>Müşteri seçin</option>
+                    <option value="1">ABC Şirketi</option>
+                    <option value="2">XYZ Holding</option>
+                    <option value="3">123 Teknoloji</option>
+                    <option value="4">Mega Gıda</option>
+                    <option value="5">Star Ofis</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentAmount">Ödeme Miktarı (₺)</label>
+                <input type="number" id="paymentAmount" name="amount" placeholder="Ödeme miktarını girin" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentDate">Ödeme Tarihi</label>
+                <input type="date" id="paymentDate" name="date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="paymentDescription">Açıklama</label>
+                <textarea id="paymentDescription" name="description" placeholder="Ödeme ile ilgili açıklama yazın"></textarea>
+            </div>
+            
+            <button type="submit" class="submit-button">
+                <i class="fas fa-save"></i> Kaydet
+            </button>
+        </form>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Yemek Şirketi Ödeme Takip</p>
+    </footer>
+</div>
+
+<script>
+    // Yeni ödeme ekleme sayfası için JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL'den müşteri ID'sini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('client');
+        
+        // Eğer URL'de müşteri ID'si varsa, select'te seç
+        if (clientId) {
+            const selectElement = document.getElementById('clientSelect');
+            selectElement.value = clientId;
+        }
+        
+        // Bugünün tarihini varsayılan olarak ayarla
+        const today = new Date();
+        const formattedDate = today.toISOString().substr(0, 10);
+        document.getElementById('paymentDate').value = formattedDate;
+        
+        // Form gönderildiğinde
+        const form = document.getElementById('newPaymentForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const clientId = document.getElementById('clientSelect').value;
+            const amount = document.getElementById('paymentAmount').value;
+            const date = document.getElementById('paymentDate').value;
+            const description = document.getElementById('paymentDescription').value;
+            
+            if (clientId && amount && date) {
+                // Başarılı kayıt animasyonu
+                const button = document.querySelector('.submit-button');
+                const originalText = button.innerHTML;
+                
+                button.innerHTML = '<i class="fas fa-check"></i> Kaydedildi';
+                button.style.background = 'linear-gradient(135deg, var(--success-color), #2ecc71)';
+                button.style.boxShadow = '0 5px 15px rgba(46, 204, 113, 0.3)';
+                
+                setTimeout(() => {
+                    // Ödemeler sayfasına yönlendir
+                    window.location.href = 'payments.html';
+                }, 1000);
+            }
+        });
+        
+        // Form elemanları için animasyonlar
+        const formGroups = document.querySelectorAll('.form-group');
+        
+        formGroups.forEach(group => {
+            const input = group.querySelector('input, select, textarea');
+            
+            if (input) {
+                input.addEventListener('focus', function() {
+                    group.style.transform = 'translateY(-5px)';
+                    group.style.transition = 'transform 0.3s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    group.style.transform = '';
+                });
+            }
+        });
+        
+        // Submit butonu için hover efekti
+        const submitButton = document.querySelector('.submit-button');
+        
+        submitButton.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = '0 8px 25px rgba(255, 107, 107, 0.4)';
+        });
+        
+        submitButton.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        });
+    });
+</script>
+</body>
+</html>
